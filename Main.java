@@ -13,6 +13,7 @@
         private static final String Dossier_Bestand = "Dossier.txt";
         private static Beheerder beheerder = new Beheerder("admin", "admin123");
         private static COAMedewerker coaMedewerker = new COAMedewerker("coauser", "coa123");
+
         List<Azc> azcs = new ArrayList<>();
         List<Gemeente> gemeentes = new ArrayList<>();
         List<Vluchteling> vluchtelingen = new ArrayList<>();
@@ -1108,6 +1109,7 @@
             boolean doorgaan = true;
 
             while (doorgaan) {
+                System.out.println( "Samuel");
                 System.out.println("=== Hoofdmenu ===");
                 System.out.println("1. Beheerdersmenu");
                 System.out.println("2. COA Medewerkersmenu");
