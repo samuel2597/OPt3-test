@@ -1108,7 +1108,7 @@
             Main beheer = new Main();
             boolean doorgaan = true;
 
-            while (doorgaan) {
+            while (doorgaan) {//
                 System.out.println( "Samuel");
                 System.out.println("=== Hoofdmenu ===");
                 System.out.println("1. Beheerdersmenu");
