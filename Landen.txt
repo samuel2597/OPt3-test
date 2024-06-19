@@ -1,0 +1,4 @@
+d200434d-b185-4c26-b9be-5895cc01f7f0,Polen,false
+05837024-2783-4d7b-9bd7-45cc0638735e,Ghana,false
+800b2a59-e4e2-4ef6-91c6-3767f416607f,Tunesie,false
+c7c22774-b953-4331-94a9-583940dacfe0,Rusland,false
