@@ -1,17 +1,23 @@
 public class BeheerderActies extends GebruikerActies {
     Landmanagement land;
     Gemeentemanagement gemeente;
-    Azcmangement azc;
+    Azcmanagement azc;
+
+
     public BeheerderActies(Persoon persoon) {
         super(persoon);
+        this.land = new Landmanagement();
+        this.gemeente = new Gemeentemanagement();
+        this.azc = new Azcmanagement();
     }
 
     @Override
     protected void toonMenu() {
         System.out.println("=== Beheerdersmenu ===");
         System.out.println("1. Beheer landen");
-        System.out.println("2. Beheer gemeentes en AZC's");
-        System.out.println("3. Keer terug naar hoofdmenu");
+        System.out.println("2. Beheer gemeentes");
+        System.out.println("3. Beheer AZC's");
+        System.out.println("4. Keer terug naar hoofdmenu");
         System.out.println("Kies een optie:");
     }
 
@@ -22,12 +28,15 @@ public class BeheerderActies extends GebruikerActies {
             String keuze = scanner.nextLine();
             switch (keuze) {
                 case "1":
-                    land.menuLanden();
+                   land.menuLanden();
                     break;
                 case "2":
-                   // menuGemeentes();
+                    gemeente.menuGemeentes();
                     break;
                 case "3":
+                    azc.menuAzc();
+                    break;
+                case "4":
                     doorgaan = false;
                     break;
                 default:
@@ -36,4 +45,3 @@ public class BeheerderActies extends GebruikerActies {
         }
     }
 }
-

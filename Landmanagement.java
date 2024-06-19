@@ -11,6 +11,9 @@ public class Landmanagement {
     private static final String Landen_Bestand = "Landen.txt"; // Het pad naar het bestand
     private List<Land> landen = new ArrayList<>(); // Een lijst om landen op te slaan
     Scanner scanner= new Scanner(System.in);
+    public List<Land> getLand() {
+        return new ArrayList<>(landen); // Return a copy of the list to maintain encapsulation
+    }
 
     public void voegEenLandToe() {
         System.out.println("Voer de naam van het land in:");

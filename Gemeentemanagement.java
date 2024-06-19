@@ -6,21 +6,26 @@ import java.nio.file.Paths;
 import java.util.Scanner;
 import java.util.List;
 import java.util.ArrayList;
+
 public class Gemeentemanagement {
     private static final String Gemeente_Bestand = "Gemeentes.txt";
-    List<Gemeente>gemeentes= new ArrayList<>();
-    Scanner  scanner= new Scanner (System.in);
+    private List<Gemeente> gemeentes = new ArrayList<>();
+    private Scanner scanner = new Scanner(System.in);
+    BeheerderActies actie;
 
-    public void voegeenGemeeentetoe() {
-        System.out.println("Voer de naam van de gemeente in");
+    public List<Gemeente> getGemeentes() {
+        return gemeentes;
+    }
+
+    public void voegeenGemeentetoe() {
+        System.out.println("Voer de naam van de gemeente in:");
         String naam = scanner.nextLine();
-        System.out.println("Voer het aantal inwoners in");
-        int aantalInwoners = scanner.nextInt();
+        System.out.println("Voer het aantal inwoners in:");
+        int aantalInwoners = Integer.parseInt(scanner.nextLine());
         Gemeente gemeente = new Gemeente(naam, aantalInwoners);
         gemeentes.add(gemeente);
         saveNieuwGemeentes(gemeente);
-        System.out.printf("Gemeente: %s, Aantal inwoners: %d Aangebodenplaatsen ", gemeente.getNaam(), gemeente.getAantalInwoner(), gemeente.getAangebodenPlaatsen());
-        System.out.println();
+        System.out.printf("Gemeente: %s, Aantal inwoners: %d Aangeboden plaatsen: %d%n", gemeente.getNaam(), gemeente.getAantalInwoner(), gemeente.getAangebodenPlaatsen());
     }
 
     public void saveNieuwGemeentes(Gemeente gemeente) {
@@ -56,10 +61,8 @@ public class Gemeentemanagement {
                     int aantalInwoners = Integer.parseInt(delen[2].trim());
                     int aangebodenPlaatsen = Integer.parseInt(delen[3].trim());
 
-                    // Maak een nieuw Gemeente-object aan en stel de ID expliciet in
                     Gemeente g = new Gemeente(naam, aantalInwoners, id);
                     g.setAangebodenPlaatsen(aangebodenPlaatsen);
-                    g.setNaam(naam);
                     gemeentes.add(g);
                 }
             }
@@ -68,35 +71,36 @@ public class Gemeentemanagement {
         }
     }
 
-    public void verwijderGemeente(){
+    public void verwijderGemeente() {
         laadGemeentes();
-        if(gemeentes.isEmpty()){
-            System.out.println("Er zijn geen gemeentes beschikbaar om te verwijderen");
+        if (gemeentes.isEmpty()) {
+            System.out.println("Er zijn geen gemeentes beschikbaar om te verwijderen.");
             return;
         }
-        System.out.println("Kies een gemeente om te verwijderen");
-        for (Gemeente g : gemeentes) {
-            System.out.printf("Gemeente: %s, Aantal inwoners:%d, Aangeboden plaatsen: %d", g.getNaam(), g.getAantalInwoner(), g.getAangebodenPlaatsen());
+
+        System.out.println("Kies een gemeente om te verwijderen:");
+        for (int i = 0; i < gemeentes.size(); i++) {
+            Gemeente g = gemeentes.get(i);
+            System.out.printf("%d. Gemeente: %s, Aantal inwoners: %d, Aangeboden plaatsen: %d%n", i + 1, g.getNaam(), g.getAantalInwoner(), g.getAangebodenPlaatsen());
         }
 
-        System.out.println("Voer het number in de gemeente die u wilt verwijderen");
-        // Probeer de keuze te verwerken
+        System.out.println("Voer het nummer in van de gemeente die u wilt verwijderen:");
         int keuze;
         try {
-            keuze = Integer.parseInt(scanner.nextLine()) - 1;
+            keuze = Integer.parseInt(scanner.nextLine()) - 1; // Correctie om naar 0-gebaseerde index om te zetten
         } catch (NumberFormatException e) {
             System.out.println("Ongeldige keuze. Probeer opnieuw.");
             return;
         }
-        if(keuze>0 && keuze<gemeentes.size()){
-            Gemeente gemeenteverijderen=gemeentes.get(keuze);
-            gemeentes.remove(gemeenteverijderen);
+
+        if (keuze >= 0 && keuze < gemeentes.size()) { // Correcte voorwaarde
+            Gemeente gemeenteVerwijderen = gemeentes.get(keuze);
+            gemeentes.remove(gemeenteVerwijderen);
             saveGemeentes();
-            System.out.println("Gemeente " + gemeenteverijderen.getNaam() + " is verwijderd.");
+            System.out.println("Gemeente " + gemeenteVerwijderen.getNaam() + " is verwijderd.");
         } else {
             System.out.println("Ongeldige keuze.");
         }
-
     }
 
     public void menuGemeentes() {
@@ -105,25 +109,17 @@ public class Gemeentemanagement {
             System.out.println("=== Gemeentes en AZC's Beheer ===");
             System.out.println("1. Voeg een gemeente toe");
             System.out.println("2. Toon en verwijder gemeente");
-            System.out.println("3. Voeg een AZC toe aan een gemeente");
-            System.out.println("4. Toon en verwijder AZC's");
-            System.out.println("5. Terug naar vorige menu");
+            System.out.println("3. Terug naar vorige menu");
             System.out.println("Kies een optie:");
             String keuze = scanner.nextLine();
             switch (keuze) {
                 case "1":
-                    voegeenGemeeentetoe();
+                    voegeenGemeentetoe();
                     break;
                 case "2":
-                   verwijderGemeente();
+                    verwijderGemeente();
                     break;
                 case "3":
-                    //voegAzcToe();
-                    break;
-                case "4":
-                   // ToonGemeenteenAzcenVerwijder();
-                    break;
-                case "5":
                     doorgaan = false;
                     break;
                 default:
@@ -131,7 +127,4 @@ public class Gemeentemanagement {
             }
         }
     }
-
-
-
 }

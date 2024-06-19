@@ -7,14 +7,24 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-public class Azcmangement {
-    private static final String Azc_Bestand = "AZC. txt";
-    List<Azc> azcs= new ArrayList<>();
-    List<Gemeente> gemeentes=new ArrayList<>();
+public class Azcmanagement {
+    private static final String Azc_Bestand = "AZC.txt";
+    List<Azc> azcs = new ArrayList<>();
+    List<Gemeente> gemeentes = new ArrayList<>();
     Gemeentemanagement gemeente;
-    Scanner scanner = new Scanner (System.in);
+    Scanner scanner = new Scanner(System.in);
+
+    public Azcmanagement() {
+        this.gemeente = new Gemeentemanagement();
+    }
+
+    public List<Azc> getAzcs() {
+        return new ArrayList<>(azcs);  // Retourneer een kopie om de encapsulatie te behouden
+    }
+
     public void voegAzcToe() {
         gemeente.laadGemeentes();
+        this.gemeentes = gemeente.getGemeentes();
         if (gemeentes.isEmpty()) {
             System.out.println("Er zijn geen gemeenten beschikbaar om te wijzigen.");
             return;
@@ -107,7 +117,7 @@ public class Azcmangement {
                     String nummer = delen[2].trim(); // Huisnummer
                     String postcode = delen[3].trim(); // Postcode
                     String gemeenteId = delen[4].trim(); // Gemeente ID
-                    int aangebodenPlaatsen = Integer.parseInt(delen[5].trim()); // Aantal aangeboden plaatsen
+                    int aangebodenPlaatsen = Integer.parseInt(delen[5].split(",")[0].trim()); // Aantal aangeboden plaatsen
 
                     // Maak een nieuw Azc-object met de juiste waarden
                     Azc azc = new Azc(straat, nummer, postcode, gemeenteId, aangebodenPlaatsen);
@@ -123,6 +133,7 @@ public class Azcmangement {
 
     public void ToonGemeenteenAzcenVerwijder() {
         gemeente.laadGemeentes();
+        this.gemeentes = gemeente.getGemeentes();
         laadAzcs();
 
         if (gemeentes.isEmpty()) {
@@ -209,5 +220,31 @@ public class Azcmangement {
         // Sla de wijzigingen op
         saveAzcs();
         gemeente.saveGemeentes();
+    }
+
+    public void menuAzc(){
+        boolean doorgaan=true;
+        while(doorgaan) {
+            System.out.println("== Azc Beheer ==");
+            System.out.println("1. Voeg een azc toe.");
+            System.out.println("2. Verwijder een azc");
+            System.out.println("3. Terug naar de vorige menu");
+            System.out.println( "Kies een van de optie hierboven");
+            String keuze= scanner.nextLine();
+            switch (keuze){
+                case("1"):
+                    voegAzcToe();
+                    break;
+                case("2"):
+                    ToonGemeenteenAzcenVerwijder();
+                    break;
+                case("3"):
+                    doorgaan=false;
+                    break;
+                default:
+                    System.out.println("Ongeldige keuze. Probeer opnieuw");
+
+            }
+        }
     }
 }

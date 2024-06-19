@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -8,7 +9,8 @@ public class Azc {
     private String postcode;
     private String gemeenteId;
     private int aangebodenPlaatsen;
-    private int gehuistvest = 0; // Nieuw veld voor gehuisveste vluchtelingen
+    private int gehuistvest = 0;
+    private List<Vluchteling> gehuisvesteVluchtelingen;
 
     public Azc(String straat, String nummer, String postcode, String gemeenteId, int aangebodenPlaatsen) {
         this.id = UUID.randomUUID().toString();
@@ -16,21 +18,26 @@ public class Azc {
         this.nummer = nummer;
         this.postcode = postcode;
         this.gemeenteId = gemeenteId;
-        this.aangebodenPlaatsen = aangebodenPlaatsen; // Zorg dat dit het juiste aantal is
+        this.aangebodenPlaatsen = aangebodenPlaatsen;
+        this.gehuisvesteVluchtelingen = new ArrayList<>();
     }
+
     public Azc(String straat, String nummer, String postcode, String gemeenteId, int aangebodenPlaatsen, String id) {
         this.id = id;
         this.straat = straat;
         this.nummer = nummer;
         this.postcode = postcode;
         this.gemeenteId = gemeenteId;
-        this.aangebodenPlaatsen = aangebodenPlaatsen; // Zorg dat dit het juiste aantal is
+        this.aangebodenPlaatsen = aangebodenPlaatsen;
+        this.gehuisvesteVluchtelingen = new ArrayList<>();
     }
-    public void huisvestVluchteling() {
+
+    public void huisvestVluchteling(Vluchteling vluchteling) {
         if (gehuistvest < aangebodenPlaatsen) {
+            gehuisvesteVluchtelingen.add(vluchteling);
             gehuistvest++;
         } else {
-            System.out.println("Dit AZC heeft geen beschikbare plaatsen meer.");
+            throw new IllegalStateException("Dit AZC heeft geen beschikbare plaatsen meer.");
         }
     }
 
@@ -38,8 +45,6 @@ public class Azc {
         return gehuistvest;
     }
 
-
-    // Getter voor aangeboden plaatsen
     public int getAantalPlaatsen() {
         return aangebodenPlaatsen;
     }
@@ -48,8 +53,9 @@ public class Azc {
     public String toString() {
         return id + ") Straat: " + straat + " nummer: " + nummer + " postcode: " + postcode + " Gemeenteid: " + gemeenteId + " aangeboden plaatsen: " + aangebodenPlaatsen;
     }
-    public String toString1(){
-        return  "Straat;  " + straat + " Huisnummer; " + nummer + " postcode; " + postcode + " aangebodenplaatsen:  " + aangebodenPlaatsen;
+
+    public String toString1() {
+        return "Straat: " + straat + " Huisnummer: " + nummer + " postcode: " + postcode + " aangeboden plaatsen: " + aangebodenPlaatsen;
     }
 
     public String getGemeenteId() {
@@ -57,26 +63,26 @@ public class Azc {
     }
 
     public String getId() {
-        return this.id;
+        return id;
     }
 
-
-    public int setAangebodenPlaatsen(int aangebodenPlaatsen) {
-        return aangebodenPlaatsen;
+    public void setAangebodenPlaatsen(int aangebodenPlaatsen) {
+        this.aangebodenPlaatsen = aangebodenPlaatsen;
     }
-
 
     public List<Vluchteling> getGehuisvesteVluchtelingen() {
-        return getGehuisvesteVluchtelingen();
+        return new ArrayList<>(gehuisvesteVluchtelingen);  // Return a copy to maintain encapsulation
     }
 
     public String getStraat() {
         return straat;
     }
-    public String getPostcode(){
+
+    public String getPostcode() {
         return postcode;
     }
-    public String getNummer(){
+
+    public String getNummer() {
         return nummer;
     }
 }

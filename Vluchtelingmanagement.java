@@ -10,14 +10,23 @@ import java.util.Scanner;
 public class Vluchtelingmanagement {
     private static final String Vluchteling_Bestand = "Vluchtelingen.txt";
     private static final String Dossier_Bestand = "Dossier.txt";
-    List<Dossier> dossiers= new ArrayList<>();
-    List<Land>landen= new ArrayList<>();
-    Landmanagement land;
-    List<Vluchteling>vluchtelingen= new ArrayList<>();
-    Scanner scanner= new Scanner(System.in);
-    public void registreerVluchteling() {
-        land.laadLanden(); // Ensure countries are loaded
+    private final List<Dossier> dossiers = new ArrayList<>();
+    private List<Land> landen = new ArrayList<>();
+    private final List<Vluchteling> vluchtelingen = new ArrayList<>();
+    private final Landmanagement land;
+    private final Scanner scanner = new Scanner(System.in);
 
+    public Vluchtelingmanagement() {
+        this.land = new Landmanagement();
+        this.land.laadLanden();
+        this.landen = land.getLand();
+        laadVluchteling();
+    }
+
+    public List<Vluchteling> getVluchtelingen() {
+        return new ArrayList<>(vluchtelingen);  // Retourneer een kopie om de encapsulatie te behouden
+    }
+    public void registreerVluchteling() {
         System.out.println("Voer de naam van de vluchteling in:");
         String naam = scanner.nextLine();
 
@@ -49,7 +58,7 @@ public class Vluchtelingmanagement {
             Dossier nieuwDossier = new Dossier(nieuweVluchteling.getId(), false, false, false, false, false, false);
             dossiers.add(nieuwDossier);
             saveNieuweVluchtelingDossier(nieuwDossier);
-            saveNieuwVuchtelingen(nieuweVluchteling);
+            saveNieuwVluchtelingen(nieuweVluchteling);
 
             System.out.printf("Nieuwe vluchteling geregistreerd: Gebruikersnaam - %s, Wachtwoord - %s%n", nieuweVluchteling.getGebruikersnaam(), nieuweVluchteling.getWachtwoord());
         } else {
@@ -57,34 +66,28 @@ public class Vluchtelingmanagement {
         }
     }
 
-
     public void saveVluchtelingen() {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(Vluchteling_Bestand, true))) {
             for (Vluchteling v : vluchtelingen) {
                 writer.write(v.toString());
                 writer.newLine();
-
             }
         } catch (IOException e) {
-            System.out.println("Er is een fout opgetreden bij het opslaan van landen: " + e.getMessage());
+            System.out.println("Er is een fout opgetreden bij het opslaan van vluchtelingen: " + e.getMessage());
         }
     }
 
-    public void saveNieuwVuchtelingen(Vluchteling v) {
+    public void saveNieuwVluchtelingen(Vluchteling v) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(Vluchteling_Bestand, true))) {
             writer.write(v.toString());
             writer.newLine();
-
-
         } catch (IOException e) {
-            System.out.println("Er is een fout opgetreden bij het opslaan van landen: " + e.getMessage());
+            System.out.println("Er is een fout opgetreden bij het opslaan van vluchtelingen: " + e.getMessage());
         }
     }
 
     public void laadVluchteling() {
         vluchtelingen.clear();
-        land.laadLanden(); // Ensure all countries are loaded
-
         try {
             List<String> lines = Files.readAllLines(Paths.get(Vluchteling_Bestand));
             for (String line : lines) {
@@ -98,7 +101,7 @@ public class Vluchtelingmanagement {
 
                     Land correspondingLand = null;
                     for (Land land : landen) {
-                        if (land.getNaam().equals(landNaam)) {
+                        if (land.getNaam().equalsIgnoreCase(landNaam.trim())) {
                             correspondingLand = land;
                             break;
                         }
@@ -123,7 +126,7 @@ public class Vluchtelingmanagement {
 
     public void BewerkVluchtelingDossier() {
         laadVluchteling(); // Laad de meest recente vluchtelinggegevens
-        laadVluchtelingDossier();//laadVluchtelingDossier(); // Laad de meest recente dossiers
+        laadVluchtelingDossier(); // Laad de meest recente dossiers
 
         if (vluchtelingen.isEmpty()) {
             System.out.println("Er zijn geen vluchtelingen geregistreerd.");
@@ -267,6 +270,7 @@ public class Vluchtelingmanagement {
         }
         return null;  // Return null if no matching dossier is found
     }
+
     public void saveNieuweVluchtelingDossier(Dossier d) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(Dossier_Bestand, true))) {
             writer.write(d.toString());
@@ -300,5 +304,25 @@ public class Vluchtelingmanagement {
         }
     }
 
+    public void bekijkPersoonlijkeDossier(Vluchteling ingelogdeVluchteling) {
+        laadVluchtelingDossier();
+        // Ophalen van het dossier
+        Dossier vluchtelingDossier = laadDossierVoorVluchteling(ingelogdeVluchteling.getId());
+        if (vluchtelingDossier == null) {
+            System.out.println("Geen dossier gevonden voor deze vluchteling.");
+        } else {
+            System.out.println("Dossier van vluchteling: " + ingelogdeVluchteling.getNaam());
+            System.out.println(vluchtelingDossier);
+        }
+    }
+
+    public Vluchteling authenticateVluchteling(String gebruikersnaam, String wachtwoord) {
+        for (Vluchteling vluchteling : vluchtelingen) {
+            if (vluchteling.getGebruikersnaam().equals(gebruikersnaam) && vluchteling.getWachtwoord().equals(wachtwoord)) {
+                return vluchteling;
+            }
+        }
+        return null; // geen vluchteling gevonden met die combinatie
+    }
 
 }

@@ -16,9 +16,21 @@ abstract class GebruikerActies {
         }
     }
 
-    protected boolean authenticate() {
-        return persoon.validerenInloggegevens(persoon.getGebruikersnaam(), persoon.getWachtwoord());
+    public boolean authenticate() {
+        System.out.print("Voer uw gebruikersnaam in: ");
+        String gebruikersnaam = scanner.nextLine();
+
+        System.out.print("Voer uw wachtwoord in: ");
+        String wachtwoord = scanner.nextLine();
+
+        if (persoon.validerenInloggegevens(gebruikersnaam, wachtwoord)) {
+            return true;
+        } else {
+            System.out.println("Authenticatie mislukt.");
+            return false;
+        }
     }
+
 
     protected abstract void toonMenu();
     protected abstract void voerGekozenActieUit();
