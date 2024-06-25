@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-public class Vluchtelingmanagement {
+public class Vluchtelingmanagement implements Subject {
     private static final String Vluchteling_Bestand = "Vluchtelingen.txt";
     private static final String Dossier_Bestand = "Dossier.txt";
     private final List<Dossier> dossiers = new ArrayList<>();
@@ -23,9 +23,22 @@ public class Vluchtelingmanagement {
         laadVluchteling();
     }
 
+    @Override
+    public void registerObserver(Observer o) {
+        if (o instanceof Vluchteling) {
+            vluchtelingen.add((Vluchteling) o);
+        }
+    }
+
+
+    public void notifySpecificObserver(Vluchteling vluchteling, String message) {
+        vluchteling.update(message);
+    }
+
     public List<Vluchteling> getVluchtelingen() {
         return new ArrayList<>(vluchtelingen);  // Retourneer een kopie om de encapsulatie te behouden
     }
+
     public void registreerVluchteling() {
         System.out.println("Voer de naam van de vluchteling in:");
         String naam = scanner.nextLine();
@@ -60,22 +73,15 @@ public class Vluchtelingmanagement {
             saveNieuweVluchtelingDossier(nieuwDossier);
             saveNieuwVluchtelingen(nieuweVluchteling);
 
+            registerObserver(nieuweVluchteling);  // Register the new refugee as an observer
+
             System.out.printf("Nieuwe vluchteling geregistreerd: Gebruikersnaam - %s, Wachtwoord - %s%n", nieuweVluchteling.getGebruikersnaam(), nieuweVluchteling.getWachtwoord());
         } else {
             System.out.println("Ongeldige keuze.");
         }
     }
 
-    public void saveVluchtelingen() {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(Vluchteling_Bestand, true))) {
-            for (Vluchteling v : vluchtelingen) {
-                writer.write(v.toString());
-                writer.newLine();
-            }
-        } catch (IOException e) {
-            System.out.println("Er is een fout opgetreden bij het opslaan van vluchtelingen: " + e.getMessage());
-        }
-    }
+
 
     public void saveNieuwVluchtelingen(Vluchteling v) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(Vluchteling_Bestand, true))) {
@@ -125,8 +131,8 @@ public class Vluchtelingmanagement {
     }
 
     public void BewerkVluchtelingDossier() {
-        laadVluchteling(); // Laad de meest recente vluchtelinggegevens
-        laadVluchtelingDossier(); // Laad de meest recente dossiers
+        laadVluchteling();
+        laadVluchtelingDossier();
 
         if (vluchtelingen.isEmpty()) {
             System.out.println("Er zijn geen vluchtelingen geregistreerd.");
@@ -167,24 +173,33 @@ public class Vluchtelingmanagement {
             System.out.println("Kies een optie:");
 
             int optie = Integer.parseInt(scanner.nextLine());
+            String veld = null;
+            String notificationMessage = null;
+
             switch (optie) {
                 case 1:
-                    toggleDossierStatus(dossier, "Paspoort getoond");
+                    veld = "Paspoort getoond";
+                    notificationMessage = toggleDossierStatus(dossier, veld);
                     break;
                 case 2:
-                    toggleDossierStatus(dossier, "Asielaanvraag compleet");
+                    veld = "Asielaanvraag compleet";
+                    notificationMessage = toggleDossierStatus(dossier, veld);
                     break;
                 case 3:
-                    toggleDossierStatus(dossier, "Rechter toegewezen");
+                    veld = "Rechter toegewezen";
+                    notificationMessage = toggleDossierStatus(dossier, veld);
                     break;
                 case 4:
-                    toggleDossierStatus(dossier, "Uitspraak rechter");
+                    veld = "Uitspraak rechter";
+                    notificationMessage = toggleDossierStatus(dossier, veld);
                     break;
                 case 5:
-                    toggleDossierStatus(dossier, "Toegelaten tot samenleving");
+                    veld = "Toegelaten tot samenleving";
+                    notificationMessage = toggleDossierStatus(dossier, veld);
                     break;
                 case 6:
-                    toggleDossierStatus(dossier, "Terugkeer naar land van herkomst");
+                    veld = "Terugkeer naar land van herkomst";
+                    notificationMessage = toggleDossierStatus(dossier, veld);
                     break;
                 case 7:
                     doorgaan = false;
@@ -193,73 +208,111 @@ public class Vluchtelingmanagement {
                     System.out.println("Ongeldige keuze. Probeer opnieuw.");
                     break;
             }
+
+            if (notificationMessage != null) {
+                notifySpecificObserver(geselecteerdeVluchteling, notificationMessage);
+            }
+
+            saveVluchtelingDossier();
         }
-        saveNieuweVluchtelingDossier(dossier); // Sla de wijzigingen op
     }
 
-    private void toggleDossierStatus(Dossier dossier, String veld) {
-        boolean validInput = false;
-        boolean status = false;
 
-        // Toon de huidige status
+    private String toggleDossierStatus(Dossier dossier, String veld) {
+        boolean currentStatus = false;
+        boolean newStatus = false;
+        boolean statusChanged = false;
+        String previousStatusString = "Nee";
+        String newStatusString = "Nee";
+        String notificationMessage = null;
+
         switch (veld) {
             case "Paspoort getoond":
-                System.out.println("Huidige status van 'Paspoort getoond': " + (dossier.isPaspoortGetoond() ? "Ja" : "Nee"));
+                currentStatus = dossier.isPaspoortGetoond();
+                newStatus = !currentStatus;
+                if (newStatus != currentStatus) {
+                    dossier.setPaspoortGetoond(newStatus);
+                    statusChanged = true;
+                }
                 break;
             case "Asielaanvraag compleet":
-                System.out.println("Huidige status van 'Asielaanvraag compleet': " + (dossier.isAsielAanvraagCompleet() ? "Ja" : "Nee"));
+                currentStatus = dossier.isAsielAanvraagCompleet();
+                newStatus = !currentStatus;
+                if (newStatus != currentStatus) {
+                    dossier.setAsielAanvraagCompleet(newStatus);
+                    statusChanged = true;
+                }
                 break;
             case "Rechter toegewezen":
-                System.out.println("Huidige status van 'Rechter toegewezen': " + (dossier.isRechterToegewezen() ? "Ja" : "Nee"));
+                currentStatus = dossier.isRechterToegewezen();
+                newStatus = !currentStatus;
+                if (newStatus != currentStatus) {
+                    dossier.setRechterToegewezen(newStatus);
+                    statusChanged = true;
+                }
                 break;
             case "Uitspraak rechter":
-                System.out.println("Huidige status van 'Uitspraak rechter': " + (dossier.isUitspraakRechter() ? "Ja" : "Nee"));
+                currentStatus = dossier.isUitspraakRechter();
+                newStatus = !currentStatus;
+                if (newStatus != currentStatus) {
+                    dossier.setUitspraakRechter(newStatus);
+                    statusChanged = true;
+                }
                 break;
             case "Toegelaten tot samenleving":
-                System.out.println("Huidige status van 'Toegelaten tot samenleving': " + (dossier.isToegelatenTotSamenleving() ? "Ja" : "Nee"));
+                currentStatus = dossier.isToegelatenTotSamenleving();
+                newStatus = !currentStatus;
+                if (newStatus != currentStatus) {
+                    dossier.setToegelatenTotSamenleving(newStatus);
+                    statusChanged = true;
+                }
                 break;
             case "Terugkeer naar land van herkomst":
-                System.out.println("Huidige status van 'Terugkeer naar land van herkomst': " + (dossier.isTerugkeerNaarLandVanHerkomst() ? "Ja" : "Nee"));
+                currentStatus = dossier.isTerugkeerNaarLandVanHerkomst();
+                newStatus = !currentStatus;
+                if (newStatus != currentStatus) {
+                    dossier.setTerugkeerNaarLandVanHerkomst(newStatus);
+                    statusChanged = true;
+                }
                 break;
+            default:
+                System.out.println("Ongeldige invoer.");
+                return null;
         }
 
-        while (!validInput) {
-            System.out.println("Wilt u deze status wijzigen? (1) Ja / (2) Nee:");
-            String input = scanner.nextLine();
+        if (statusChanged) {
+            previousStatusString = currentStatus ? "Ja" : "Nee";
+            newStatusString = newStatus ? "Ja" : "Nee";
+            notificationMessage = String.format("%s: veranderd van %s naar %s", veld, previousStatusString, newStatusString);
+            System.out.println("Status van '" + veld + "' is bijgewerkt naar " + newStatusString);
+        } else {
+            System.out.println("Status van '" + veld + "' is niet gewijzigd.");
+        }
 
-            if ("1".equals(input)) {
-                status = true;
-                validInput = true;
-            } else if ("2".equals(input)) {
-                status = false;
-                validInput = true;
-            } else {
-                System.out.println("Ongeldige invoer. Voer '1' voor Ja of '2' voor Nee.");
+        return notificationMessage;
+    }
+
+
+    public void bekijkPersoonlijkeDossier(Vluchteling ingelogdeVluchteling) {
+        laadVluchtelingDossier();
+        // Ophalen van het dossier
+        Dossier vluchtelingDossier = laadDossierVoorVluchteling(ingelogdeVluchteling.getId());
+        if (vluchtelingDossier == null) {
+            System.out.println("Geen dossier gevonden voor deze vluchteling.");
+        } else {
+            System.out.println("Dossier van vluchteling: " + ingelogdeVluchteling.getNaam());
+            System.out.println(vluchtelingDossier);
+
+            // Display notifications
+            List<String> notifications = ingelogdeVluchteling.getNotifications();
+            if (!notifications.isEmpty()) {
+                System.out.println("\n=== Notificaties ===");
+                for (String notification : notifications) {
+                    System.out.println(notification);
+                }
+                ingelogdeVluchteling.clearNotifications(); // Clear notifications after displaying
             }
         }
-
-        switch (veld) {
-            case "Paspoort getoond":
-                dossier.setPaspoortGetoond(status);
-                break;
-            case "Asielaanvraag compleet":
-                dossier.setAsielAanvraagCompleet(status);
-                break;
-            case "Rechter toegewezen":
-                dossier.setRechterToegewezen(status);
-                break;
-            case "Uitspraak rechter":
-                dossier.setUitspraakRechter(status);
-                break;
-            case "Toegelaten tot samenleving":
-                dossier.setToegelatenTotSamenleving(status);
-                break;
-            case "Terugkeer naar land van herkomst":
-                dossier.setTerugkeerNaarLandVanHerkomst(status);
-                break;
-        }
-
-        System.out.println("Status van '" + veld + "' is bijgewerkt naar " + (status ? "Ja" : "Nee"));
     }
 
     public Dossier laadDossierVoorVluchteling(String vluchtelingId) {
@@ -275,6 +328,17 @@ public class Vluchtelingmanagement {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(Dossier_Bestand, true))) {
             writer.write(d.toString());
             writer.newLine();
+        } catch (IOException e) {
+            System.out.println("Fout bij het opslaan van het dossier: " + e.getMessage());
+        }
+    }
+
+    public void saveVluchtelingDossier() {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(Dossier_Bestand))) {
+            for (Dossier d: dossiers) {
+                writer.write(d.toString());
+                writer.newLine();
+            }
         } catch (IOException e) {
             System.out.println("Fout bij het opslaan van het dossier: " + e.getMessage());
         }
@@ -304,18 +368,6 @@ public class Vluchtelingmanagement {
         }
     }
 
-    public void bekijkPersoonlijkeDossier(Vluchteling ingelogdeVluchteling) {
-        laadVluchtelingDossier();
-        // Ophalen van het dossier
-        Dossier vluchtelingDossier = laadDossierVoorVluchteling(ingelogdeVluchteling.getId());
-        if (vluchtelingDossier == null) {
-            System.out.println("Geen dossier gevonden voor deze vluchteling.");
-        } else {
-            System.out.println("Dossier van vluchteling: " + ingelogdeVluchteling.getNaam());
-            System.out.println(vluchtelingDossier);
-        }
-    }
-
     public Vluchteling authenticateVluchteling(String gebruikersnaam, String wachtwoord) {
         for (Vluchteling vluchteling : vluchtelingen) {
             if (vluchteling.getGebruikersnaam().equals(gebruikersnaam) && vluchteling.getWachtwoord().equals(wachtwoord)) {
@@ -324,5 +376,4 @@ public class Vluchtelingmanagement {
         }
         return null; // geen vluchteling gevonden met die combinatie
     }
-
 }

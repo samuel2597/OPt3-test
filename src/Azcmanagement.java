@@ -1,3 +1,4 @@
+
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -131,7 +132,7 @@ public class Azcmanagement {
         }
     }
 
-    public void ToonGemeenteenAzcenVerwijder() {
+    public void VerwijderAzc() {
         gemeente.laadGemeentes();
         this.gemeentes = gemeente.getGemeentes();
         laadAzcs();
@@ -236,7 +237,7 @@ public class Azcmanagement {
                     voegAzcToe();
                     break;
                 case("2"):
-                    ToonGemeenteenAzcenVerwijder();
+                    VerwijderAzc();
                     break;
                 case("3"):
                     doorgaan=false;

@@ -1,2 +1,0 @@
-Paspoort Getoond: false, Asielaanvraag Compleet: false, Rechter Toegewezen: false, Uitspraak Rechter: false, Toegelaten Tot Samenleving: false, Terugkeer Naar Land Van Herkomst: false, VluvhtelingID: 3e9d845e-ae81-44b9-a2ec-6b823624a18c
-Paspoort Getoond: true, Asielaanvraag Compleet: false, Rechter Toegewezen: false, Uitspraak Rechter: false, Toegelaten Tot Samenleving: false, Terugkeer Naar Land Van Herkomst: false, VluvhtelingID: 3e9d845e-ae81-44b9-a2ec-6b823624a18c

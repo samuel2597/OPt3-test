@@ -82,6 +82,7 @@ public class VluchtelingHuisvestingBeheer {
         }
 
         azcManagement.saveAzcs();
+
     }
 
     public void BekijkeigenAZC(Vluchteling vluchteling) {

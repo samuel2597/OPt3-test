@@ -15,12 +15,12 @@ public class Dossier {
         public Dossier(String vluchtelingId,boolean paspoortGetoond,boolean asielAanvraagCompleet ,boolean rechterToegewezen, boolean uitspraakRechter, boolean toegelatenTotSamenleving, boolean terugkeerNaarLandVanHerkomst) {
             // Standaard waarden instellen
             this.vluchtelingId= vluchtelingId;
-            this.paspoortGetoond = false;
-            this.asielAanvraagCompleet = false;
-            this.rechterToegewezen = false;
-            this.uitspraakRechter = false;
-            this.toegelatenTotSamenleving = false;
-            this.terugkeerNaarLandVanHerkomst = false;
+            this.paspoortGetoond = paspoortGetoond;
+            this.asielAanvraagCompleet = asielAanvraagCompleet;
+            this.rechterToegewezen = rechterToegewezen;
+            this.uitspraakRechter = uitspraakRechter;
+            this.toegelatenTotSamenleving = toegelatenTotSamenleving;
+            this.terugkeerNaarLandVanHerkomst = terugkeerNaarLandVanHerkomst;
         }
 
 
